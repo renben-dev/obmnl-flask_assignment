@@ -13,7 +13,7 @@ transactions = [
 
 # Read operation
 @app.route("/")
-def get_transactions()
+def get_transactions():
     return render_template("transactions.html", transactions = transactions)
 
 # Create operation
@@ -27,22 +27,24 @@ def add_transaction():
     
     if request.method == 'POST':
         try:
-            next_id = max(data, key=lambda x: x['id'])['id']+1
+            next_id = max(transactions, key=lambda x: x['id'])['id']+1
         except:
             next_id =0
-
+        print(f"\n\nnext_id: {next_id}\n\n")
         transaction = {
             'id':       next_id + 1,
             'date':     request.form.get('date'),
-            'amount':   request.form.get('amount')           
+            'amount':   float(request.form.get('amount'))           
         }
 
         transactions.append(transaction)
         return redirect(url_for("get_transactions"))
 
-    return redirect("form.html")
+    return render_template("form.html")
+
+
 # Update operation
-@app.route("/edit/<int:transaction_id>",methods : ["GET", "POST"])
+@app.route("/edit/<int:transaction_id>",methods = ["GET", "POST"])
 def edit_transaction(transaction_id):
     try:
         transaction = next((trans for trans in transactions if trans['id'] == transaction_id ))
@@ -59,7 +61,7 @@ def edit_transaction(transaction_id):
     
     return ({"message": "This transaction id is not found"}, 404)
 # Delete operation
-@app.route("/delete/<int: transaction_id")
+@app.route("/delete/<int:transaction_id>")
 def delete_transaction(transaction_id):
     try:
         transaction = next((trans for trans in transactions if trans['id'] == transaction_id ))
@@ -76,4 +78,4 @@ def delete_transaction(transaction_id):
     
 
 if __name__ == "__main__":
-    app.run(degug, True)
+    app.run(debug = True)
